@@ -65,7 +65,7 @@ func Run(tasks []Task, n, m int) error {
 		} else if int(taskCounter) < len(tasks) {
 			jobs <- tasks[taskCounter]
 			atomic.AddInt32(&taskCounter, 1)
-		} else if resultsTotal >= int32(len(tasks)) {
+		} else if int(resultsTotal) >= len(tasks) {
 			for range n {
 				shutDown <- true
 			}
