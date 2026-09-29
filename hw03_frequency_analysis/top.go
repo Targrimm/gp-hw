@@ -21,7 +21,7 @@ func Top10(original string) []string {
 		Value int
 	}
 
-	var forSorting []keyValue
+	var forSorting = make([]keyValue, 0, len(mappedWords))
 
 	for word, count := range mappedWords {
 		forSorting = append(forSorting, keyValue{word, count})
