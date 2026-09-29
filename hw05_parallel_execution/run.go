@@ -45,7 +45,7 @@ func Run(tasks []Task, n, m int) error {
 	for range n {
 		wg.Add(1)
 		go worker(jobs, results, shutDown, &wg)
-		if taskCounter < int32(len(tasks)-1) {
+		if int(taskCounter) < (len(tasks) - 1) {
 			jobs <- tasks[taskCounter]
 			atomic.AddInt32(&taskCounter, 1)
 		}
@@ -56,13 +56,13 @@ func Run(tasks []Task, n, m int) error {
 			atomic.AddInt32(&errorsTotal, 1)
 		}
 		atomic.AddInt32(&resultsTotal, 1)
-		if m >= 0 && errorsTotal > int32(m) {
+		if m >= 0 && int(errorsTotal) > m {
 			for range n {
 				shutDown <- true
 			}
 			res = ErrErrorsLimitExceeded
 			break
-		} else if taskCounter < int32(len(tasks)) {
+		} else if int(taskCounter) < len(tasks) {
 			jobs <- tasks[taskCounter]
 			atomic.AddInt32(&taskCounter, 1)
 		} else if resultsTotal >= int32(len(tasks)) {
