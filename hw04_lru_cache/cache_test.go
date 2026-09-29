@@ -50,7 +50,69 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(5)
+
+		wasInCache := c.Set("aaa", 100)
+		require.False(t, wasInCache)
+
+		c.Clear()
+
+		val, ok := c.Get("aaa")
+		require.False(t, ok)
+		require.Nil(t, val)
+	})
+
+	t.Run("cache overflow", func(t *testing.T) {
+		c := NewCache(3)
+
+		c.Set("1", 1)
+		c.Set("2", 2)
+		c.Set("3", 3)
+		c.Set("4", 4)
+
+		val, ok := c.Get("1")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("2")
+		require.True(t, ok)
+		require.Equal(t, 2, val)
+
+		val, ok = c.Get("3")
+		require.True(t, ok)
+		require.Equal(t, 3, val)
+
+		val, ok = c.Get("4")
+		require.True(t, ok)
+		require.Equal(t, 4, val)
+	})
+
+	t.Run("cache lifecycle", func(t *testing.T) {
+		c := NewCache(3)
+
+		c.Set("1", 1)
+		c.Set("2", 2)
+		c.Set("3", 3)
+
+		c.Set("2", 20)
+		c.Get("1")
+		c.Set("4", 4)
+
+		val, ok := c.Get("1")
+		require.True(t, ok)
+		require.Equal(t, 1, val)
+
+		val, ok = c.Get("2")
+		require.True(t, ok)
+		require.Equal(t, 20, val)
+
+		val, ok = c.Get("3")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("4")
+		require.True(t, ok)
+		require.Equal(t, 4, val)
 	})
 }
 
