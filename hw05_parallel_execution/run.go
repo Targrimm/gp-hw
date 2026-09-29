@@ -51,25 +51,27 @@ func Run(tasks []Task, n, m int) error {
 		}
 	}
 
+loop:
 	for result := range results {
 		if result {
 			atomic.AddInt32(&errorsTotal, 1)
 		}
 		atomic.AddInt32(&resultsTotal, 1)
-		if m >= 0 && int(errorsTotal) > m {
+		switch {
+		case m >= 0 && int(errorsTotal) > m:
 			for range n {
 				shutDown <- true
 			}
 			res = ErrErrorsLimitExceeded
-			break
-		} else if int(taskCounter) < len(tasks) {
+			break loop
+		case int(taskCounter) < len(tasks):
 			jobs <- tasks[taskCounter]
 			atomic.AddInt32(&taskCounter, 1)
-		} else if int(resultsTotal) >= len(tasks) {
+		case int(resultsTotal) >= len(tasks):
 			for range n {
 				shutDown <- true
 			}
-			break
+			break loop
 		}
 	}
 
