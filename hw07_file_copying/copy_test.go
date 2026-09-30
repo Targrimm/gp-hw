@@ -94,7 +94,6 @@ func TestCopy(t *testing.T) {
 			require.NoError(t, err)
 			testResult, err := os.ReadFile(test.file)
 			require.NoError(t, err)
-			require.Equal(t, string(result), string(testResult))
 			require.Equal(t, result, testResult)
 		})
 	}
