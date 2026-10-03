@@ -45,3 +45,27 @@ func TestUnpackInvalidString(t *testing.T) {
 		})
 	}
 }
+
+func TestAddon(t *testing.T) {
+	tests := []struct {
+		input       string
+		output      string
+		expectError bool
+	}{
+		{input: "d\n5abc", output: "d\n\n\n\n\nabc", expectError: false},
+		{input: "☺4☻3ツ2🏖3🇧🇷2🇳🇱5", output: "☺☺☺☺☻☻☻ツツ🏖🏖🏖🇧🇷🇧🇷🇳🇱🇳🇱🇳🇱🇳🇱🇳🇱", expectError: false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.input, func(t *testing.T) {
+			output, err := Unpack(test.input)
+
+			require.Equal(t, test.output, output)
+			if test.expectError {
+				require.Truef(t, errors.Is(err, ErrInvalidString), "actual error %q", err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
