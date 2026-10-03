@@ -25,26 +25,33 @@ func Unpack(original string) (string, error) {
 	gs := uniseg.NewGraphemes(original)
 
 	var previous *string
-	for range uniseg.GraphemeClusterCount(original) + 1 {
-		gs.Next()
+	for gs.Next() {
 		current := gs.Str()
 
 		number, err := strconv.Atoi(current)
 
+		// Two numbers in a row or number as first grapheme
+		if err == nil && previous == nil {
+			return "", ErrInvalidString
+		}
+
 		if err == nil {
-			if previous == nil {
-				return "", ErrInvalidString
-			}
+			// Got number: add multiple previous graphemes
 			for range number {
 				result.WriteString(*previous)
 			}
 			previous = nil
 		} else {
+			// Gor common grapheme: add previous if exist
 			if previous != nil {
 				result.WriteString(*previous)
 			}
 			previous = &current
 		}
+	}
+
+	if previous != nil {
+		result.WriteString(*previous)
 	}
 
 	return result.String(), nil
